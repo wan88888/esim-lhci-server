@@ -25,8 +25,9 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli
 
-      - name: Upload Lighthouse Report
-        run: |
-          LHCI_BUILD_CONTEXT__CURRENT_HASH=github-actions \
-          lhci autorun --config=lighthouserc.js || true
-          lhci upload --serverBaseUrl=${{ secrets.LHCI_SERVER_URL }} --token=${{ secrets.LHCI_BUILD_TOKEN }}
+      - name: Run Lighthouse CI
+        run: lhci autorun --config=lighthouserc.js
+        env:
+          LHCI_SERVER_URL: ${{ secrets.LHCI_SERVER_URL }}
+          LHCI_TOKEN: ${{ secrets.LHCI_BUILD_TOKEN }}
+          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
