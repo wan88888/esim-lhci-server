@@ -15,7 +15,12 @@ module.exports = {
         },
       },
       upload: {
-        target: 'temporary-public-storage',
+        target: 'lhci',
+        // 支持从环境变量读取，方便 CI/CD
+        serverBaseUrl: process.env.LHCI_SERVER_URL || 'http://localhost:9001',
+        token: process.env.LHCI_TOKEN || '4602c7a8-e4fd-482d-810b-9964a758b985',
+        // 添加详细日志以便调试
+        logLevel: 'verbose',
       },
     },
   };
