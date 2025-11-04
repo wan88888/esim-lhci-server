@@ -7,7 +7,7 @@
 - **测试网站**: https://esimnum.com/home
 - **测试次数**: 每次运行 3 次
 - **测试环境**: Desktop 桌面模式
-- **LHCI Server**: http://localhost:9001
+- **LHCI Server**: http://192.168.10.63:9001
 
 ## 🚀 快速开始
 
@@ -15,7 +15,7 @@
 
 - Node.js 14+ 
 - npm 或 yarn
-- 运行中的 Lighthouse CI Server (端口 9001)
+- 可访问 Lighthouse CI Server (http://192.168.10.63:9001)
 
 ### 安装依赖
 
@@ -38,8 +38,8 @@ npm run test:ci
 测试完成后，可以通过以下方式查看结果：
 
 1. **直接访问构建链接** - 运行测试后控制台会输出链接
-2. **访问项目页面**: http://localhost:9001/app/projects/esim-lhci-server
-3. **访问服务器首页**: http://localhost:9001
+2. **访问项目页面**: http://192.168.10.63:9001/app/projects/esim-lhci-server
+3. **访问服务器首页**: http://192.168.10.63:9001
 
 ## ⚙️ 配置说明
 
@@ -59,29 +59,6 @@ npm run test:ci
 
 - 性能（Performance）: ≥ 30% （error 级别）
 - 可访问性（Accessibility）: ≥ 30% （warn 级别）
-
-## 🔄 GitHub Actions CI/CD
-
-项目包含 GitHub Actions 工作流，在以下情况自动运行测试：
-
-- **Push 到 main 分支**
-- **Pull Request 到 main 分支**
-- **每天自动运行**（UTC 时间 02:00，北京时间 10:00）
-
-### 工作流功能
-
-✅ 自动安装依赖  
-✅ 运行 Lighthouse 测试  
-✅ 上传结果到 LHCI Server  
-✅ 生成性能报告  
-✅ 自动失败通知
-
-### 查看 CI 结果
-
-前往 GitHub Actions 页面查看运行状态和结果：
-```
-https://github.com/wan88888/esim-lhci-server/actions
-```
 
 ## 🛠️ 开发指南
 
@@ -110,12 +87,16 @@ assert: {
 }
 ```
 
-### 启用详细日志
+### 修改服务器配置
+
+编辑 `lighthouserc.js` 中的 upload 部分：
 
 ```javascript
 upload: {
-  // ...
-  logLevel: 'verbose',  // 启用详细日志
+  target: 'lhci',
+  serverBaseUrl: 'http://192.168.10.63:9001',
+  token: '4602c7a8-e4fd-482d-810b-9964a758b985',
+  logLevel: 'verbose',  // 可选：启用详细日志
 }
 ```
 
@@ -126,49 +107,51 @@ upload: {
 - **主分支**: main
 - **仓库**: https://github.com/wan88888/esim-lhci-server
 
-## 🔐 环境变量（CI/CD）
-
-在 GitHub Secrets 中配置以下变量：
-
-| 变量名 | 说明 | 必需 |
-|--------|------|------|
-| `LHCI_SERVER_URL` | Lighthouse CI Server 地址 | ✅ |
-| `LHCI_TOKEN` | 项目认证 Token | ✅ |
-
-### 设置 GitHub Secrets
-
-1. 进入仓库 Settings → Secrets and variables → Actions
-2. 点击 "New repository secret"
-3. 添加上述变量
-
 ## 📝 常见问题
 
 ### 1. 服务器连接失败
 
-确保 Lighthouse CI Server 正在运行：
+确保 Lighthouse CI Server 正在运行并可访问：
 ```bash
-curl http://localhost:9001/version
+curl http://192.168.10.63:9001/version
 ```
+
+如果无法访问，请检查：
+- 服务器是否在运行
+- 网络连接是否正常
+- 防火墙设置是否允许访问
 
 ### 2. Token 无效
 
-检查 `lighthouserc.js` 中的 token 是否正确，或者重新生成：
-```bash
-lhci server --storage.storageMethod=sql --storage.sqlDatabasePath=./lhci.db
-```
+如果遇到 token 认证失败，请检查：
+- `lighthouserc.js` 中的 token 是否与服务器匹配
+- 在 LHCI Server 管理界面重新生成 token
+- Token: `4602c7a8-e4fd-482d-810b-9964a758b985`
 
 ### 3. 测试失败
 
-查看详细日志：
+查看详细日志以获取更多信息：
 ```bash
-npm run test -- --verbose
+npm run test
 ```
 
-### 4. CI 环境中无法访问本地服务器
+如果需要更详细的输出，可以修改 `lighthouserc.js` 添加：
+```javascript
+upload: {
+  logLevel: 'verbose',
+}
+```
 
-CI 环境需要公网可访问的 LHCI Server 地址，考虑：
-- 使用云服务器部署 LHCI Server
-- 使用 Vercel/Netlify 等平台的 LHCI 集成
+### 4. 修改服务器地址
+
+如果需要修改 LHCI Server 地址，编辑 `lighthouserc.js`：
+```javascript
+upload: {
+  target: 'lhci',
+  serverBaseUrl: 'http://YOUR_SERVER_IP:9001',
+  token: 'YOUR_TOKEN',
+}
+```
 
 ## 📚 相关资源
 
